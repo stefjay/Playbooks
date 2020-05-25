@@ -1,31 +1,36 @@
 #Playbook for deploying Docker
 #Deploying to PiCluster only, modify hosts as needed.
-#
+---
 - hosts: picluster
   become: true
-
   tasks:
     - name: install aptitude
-       apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
-
+      apt: name=aptitude state=latest update_cache=yes force_apt_get=yes 
+    
     - name: Install required system packages
       apt: name={{ item }} state=latest update_cache=yes
-     loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
-
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools']
+    
     - name: Add docker GPG key
-     apt_key:
-       url: https://download.docker.com/linux/ubuntu/gpg
-       state: present
-
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+    
     - name: Add docker repo
-     apt_repository:
-       repo: deb https://download.docker.com/linux/ubuntu bionic stable
-       state: present
-
+      apt_repository:
+        repo: deb https://download.docker.com/linux/debian stretch stable
+        state: present
+    - name: Index new Repo into the cache
+      apt: 
+        name: "*" 
+        state: latest 
+        update_cache: yes 
+        force_apt_get: yes
+    
     - name: Update apt-get and installer docker-ce
-     apt: update_cache=yes name:docker-ce state=latest
-
+      apt: update_cache=yes name=docker-ce state=latest
+    
     - name: Install Docker module for python
-     pip:
-      name: docker
-     
+      pip:
+        name: docker
+       
